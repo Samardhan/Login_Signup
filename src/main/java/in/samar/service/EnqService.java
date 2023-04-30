@@ -5,21 +5,25 @@ import java.util.List;
 import in.samar.binding.DashBoardResponse;
 import in.samar.binding.EnqForm;
 import in.samar.binding.EnqSearchCriteria;
-import in.samar.entity.CourseEntity;
-import in.samar.entity.EnqEntity;
+import in.samar.entity.StudentEnqEntity;
 
 public interface EnqService {
 
-	public List<CourseEntity> course();
+	public List<String> course();
 	
-	public List<EnqEntity> enq();
+	public List<String> enq();
 	
 	public DashBoardResponse dashboard(Integer userId);
 	
 	public String upsertEnq(EnqForm enq);
 	
-	public List<EnqForm> getEnq (Integer userId , EnqSearchCriteria enqSearch);
+	public List<StudentEnqEntity> getEnq (Integer uid,EnqSearchCriteria enqSearch);
 	
-	public EnqForm editEnq (Integer enqId);
+	public EnqForm editEnq (Integer id);
+	
+	public List<StudentEnqEntity> getFilterData(EnqSearchCriteria criteria,Integer uid);
+	
+	
+	
 	
 }

@@ -6,4 +6,5 @@ import in.samar.entity.StudentEnqEntity;
 
 public interface StudentEnqRepo extends JpaRepository<StudentEnqEntity, Integer>{
 
+	public StudentEnqEntity findByStudentNumber(Long studentNumber);
 }

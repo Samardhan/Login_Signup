@@ -10,6 +10,5 @@ public interface UserDetailsRepo extends JpaRepository<UsersDetailsEntity, Integ
 	public UsersDetailsEntity findByUserEmail(String userEmail);
 	
 	
-	//public UsersDetailsEntity findByUserEmailandUserPassword(String userEmail,String userPassword);
 	
 }

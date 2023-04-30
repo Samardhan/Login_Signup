@@ -9,7 +9,9 @@ public class Application {
 
 	public static void main(String[] args) {
 
-		ConfigurableApplicationContext ctxt = SpringApplication.run(Application.class, args);
+		SpringApplication.run(Application.class, args);
+		
+//		ConfigurableApplicationContext ctxt = SpringApplication.run(Application.class, args);
 
 		/*
 		UserDetailsRepo repo = ctxt.getBean(UserDetailsRepo.class);
