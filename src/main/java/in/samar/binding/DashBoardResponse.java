@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class DashBoardResponse {
 	
-	private String totalEnq;
-	private String enrolledCount;
-	private String lostCount;
+	private Integer totalEnq;
+	private Integer enrolledCount;
+	private Integer lostCount;
 	
 
 }

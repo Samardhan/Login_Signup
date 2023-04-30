@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import in.samar.binding.LoginForm;
 import in.samar.binding.SignUpForm;
 import in.samar.binding.UnlockForm;
+import in.samar.binding.resetForm;
 import in.samar.service.UserService;
 
 @Controller
@@ -19,57 +20,31 @@ public class UserController {
 	@Autowired
 	private UserService us;
 
+	// LOGIN
+
 	@PostMapping("/login")
 	public String loginSuc(@ModelAttribute("login") LoginForm lform, Model m) {
 
 		String go = "login";
-		if (lform != null ) {
-			if (lform.getUserEmail() != null && !lform.getUserEmail().equals(" ")) {
 
-				if (lform.getUserPassword() != null && !lform.getUserPassword().equals(" ")) {
+		if (!lform.getUserEmail().equals("") && !lform.getUserPassword().equals("")) {
 
-					String loginstatus = us.loginForm(lform);
+			
+			String loginstatus = us.loginForm(lform);
 
-					if (loginstatus == "success") {
+			if (loginstatus.contains("success")) {
 
-						boolean accStatus = us.checkAccountStatus(lform.getUserEmail());
-
-						if (accStatus) {
-							go = "dashboard";
-
-						} else {
-							go = "login";
-							m.addAttribute("accLock", "Account is Locked.... Unlock Now");
-						}
-
-					} else if (loginstatus == "wrongPassword") {
-						go = "login";
-						m.addAttribute("wrongPassword", "Enter Correct Password");
-					}else if(loginstatus == "empty") {
-						
-						go="login";
-						m.addAttribute("noemail", "Account Does not Exists...Signup before Login");
-						
-					}
-					else {
-						go = "login";
-						m.addAttribute("wrongEmail", "Enter Correct Email");
-					}
-				} else {
-					go = "login";
-					m.addAttribute("emptypassword", "Password Should not be Empty");
-				}
+				go = "redirect:/dashboard";
 
 			} else {
-				go = "login";
-				m.addAttribute("emptyEmail", "Email should not be Empty");
+
+				m.addAttribute("msg", loginstatus);
+
 			}
 
 		} else {
-
-			go = "login";
-			m.addAttribute("fill", "Enter All Details to Login");
-
+			// go = "login";
+			m.addAttribute("empty", "Email and Password should not be Empty");
 		}
 
 		return go;
@@ -83,18 +58,27 @@ public class UserController {
 		return "login";
 	}
 
+	// SIGNUP
+
 	@PostMapping("/signup")
 	public String getSignup(@ModelAttribute("signup") SignUpForm form, Model model) {
 
-		boolean status = us.signUpForm(form);
+		if (!form.getUserEmail().equals("") && !form.getUserName().equals("") && form.getUserPhone() != null) {
+			boolean status = us.signUpForm(form);
 
-		if (status) {
-			model.addAttribute("success", " Check Your Email");
+			if (status) {
+				model.addAttribute("success", " Check Your Email");
+			} else {
+				model.addAttribute("fail", "Account Already Exists on this Email");
+			}
+
 		} else {
-			model.addAttribute("fail", "Account Already Exists on this Email");
-		}
 
+			model.addAttribute("empty", "Enter All Details to SignUp");
+
+		}
 		return "signup";
+
 	}
 
 	@GetMapping("/signup")
@@ -105,35 +89,66 @@ public class UserController {
 		return "signup";
 	}
 
-	@GetMapping("/forgotPwd")
-	public String forgotpwdPage() {
+	// FORGOT PASSWORD
+
+	@PostMapping("/forgotPwd")
+	public String forgotPage(@ModelAttribute("email") String email, Model m) {
+
+		if (!email.equals("")) {
+			boolean fp = us.forgotPassword(email);
+
+			if (fp) {
+
+				m.addAttribute("sent", "Password Sent to Your Email");
+			} else {
+				m.addAttribute("wrong", "Enter Correct Email");
+			}
+		} else {
+			m.addAttribute("empty", "Enter your Email");
+		}
 
 		return "forgotPwd";
 	}
 
+	@GetMapping("/forgotPwd")
+	public String forgotpwdPage() {
+
+		// m.addAttribute("email", new forgotPwd());
+
+		return "forgotPwd";
+	}
+
+	// UNLOCK
+
 	@PostMapping("/unlock")
 	public String unlockAcc(@ModelAttribute("unlock") UnlockForm unForm, Model model) {
 
-		boolean accountStatus = us.checkAccountStatus(unForm.getUserEmail());
+		if (!unForm.getTempPassword().equals("") && !unForm.getNewPassword().equals("")
+				&& !unForm.getConfirmPassword().equals("")) {
 
-		if (!accountStatus) {
+			boolean accountStatus = us.checkAccountStatus(unForm.getUserEmail());
 
-			if (unForm.getNewPassword().equals(unForm.getConfirmPassword())) {
+			if (!accountStatus) {
 
-				boolean status = us.unlockForm(unForm);
+				if (unForm.getNewPassword().equals(unForm.getConfirmPassword())) {
 
-				if (status) {
-					model.addAttribute("sucmsg", "Account Unlocked .... Login Now");
+					boolean status = us.unlockForm(unForm);
+
+					if (status) {
+						model.addAttribute("sucmsg", "Account Unlocked .... Login Now");
+					} else {
+						model.addAttribute("temperr", "Enter Temporary Password Correctly");
+					}
+
 				} else {
-					model.addAttribute("temperr", "Enter Temporary Password Correctly");
+					model.addAttribute("pwderror", "Entered Passwords are Not matching");
 				}
 
 			} else {
-				model.addAttribute("pwderror", "Entered Passwords are Not matching");
+				model.addAttribute("exists", "Account Already Unlocked Please login");
 			}
-
 		} else {
-			model.addAttribute("exists", "Account Already Unlocked Please login");
+			model.addAttribute("empty", "Enter All Details");
 		}
 
 		return "unlock";
@@ -149,5 +164,44 @@ public class UserController {
 		// model.addAttribute("userEmail", unForm.getUserEmail());
 
 		return "unlock";
+	}
+
+	// RESET PASSWORD
+
+	@PostMapping("/resetPwd")
+	public String resetPwdSucc(@ModelAttribute("resetpwd") resetForm resetPwd, Model m) {
+
+		if (!resetPwd.getOldPassword().equals("") && !resetPwd.getNewPassword().equals("")
+				&& resetPwd.getNewPassword() != null && !resetPwd.getConfirmPassword().equals("")
+				&& resetPwd.getConfirmPassword() != null) {
+
+			if (resetPwd.getNewPassword().equals(resetPwd.getConfirmPassword())) {
+				boolean rp = us.resetPassword(resetPwd);
+
+				if (rp) {
+					m.addAttribute("changed", "Password Changed Successfully");
+				} else {
+					m.addAttribute("err", "Please Enter Correct Old Password");
+				}
+			} else {
+				m.addAttribute("nomatch", "Passwords are Not Matching");
+			}
+
+		} else {
+			m.addAttribute("empty", "Enter All Details");
+		}
+
+		return "resetPwd";
+	}
+
+	@GetMapping("/resetPwd")
+	public String resetPassword(@RequestParam String email, Model m) {
+
+		resetForm rf = new resetForm();
+		rf.setUserEmail(email);
+
+		m.addAttribute("resetpwd", rf);
+
+		return "resetPwd";
 	}
 }

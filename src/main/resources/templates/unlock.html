@@ -86,6 +86,7 @@
 									<p th:text="${temperr}" class="text-danger"></p>
 									<p th:text="${pwderror}" class="text-danger"></p>
 									<p th:text="${exists}" class="text-danger"></p>
+									<p th:text="${empty}" class="text-danger"></p>
 									
 									<form th:action="@{/unlock}"  th:object="${unlock}" method="post">
 
@@ -123,6 +124,8 @@
 											<p class="mb-0 me-2">Already Unlocked?</p>
 											<a href="login" type="button" class="btn btn-outline-danger">Login
 												Here</a>
+												
+											
 										</div>
 
 									</form>

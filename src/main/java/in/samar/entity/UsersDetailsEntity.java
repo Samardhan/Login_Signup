@@ -1,9 +1,14 @@
 package in.samar.entity;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import lombok.Data;
 
@@ -25,9 +30,7 @@ public class UsersDetailsEntity {
 
 	private String accountStatus;
 
-	/*
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "userId", fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.EAGER)
 	private List<StudentEnqEntity> stuEnq;
-	
-*/
+
 }
